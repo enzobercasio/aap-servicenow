@@ -1,0 +1,39 @@
+---
+- name: Create an Incident in ServiceNow
+  hosts: localhost
+  gather_facts: false
+
+  collections:
+  - servicenow.itsm
+
+  tasks:
+    - name: Send GET request to ServiceNow incident table
+      uri:
+        #url: "https://dev313896.service-now.com/api/now/table/incident?sysparm_limit=5&sysparm_display_value=true"
+        url: "https://{{ snow_instance }}.service-now.com/api/now/table/incident?sysparm_limit=5&sysparm_display_value=true"
+        method: GET
+        #user: "aes.creator"
+        user: "{{ snow_username }}"
+        #password: "wAAy0$/AsS9n"
+        password: "{{ snow_password }}"
+        force_basic_auth: yes
+        return_content: yes
+        status_code: 200
+        headers:
+          Accept: "application/json"
+      register: response
+
+    - name: Show response status and sample result
+      debug:
+        msg:
+          - "HTTP status: {{ response.status }}"
+          - "Sample record: {{ response.json.result[0] | default('No results returned') }}"
+
+    - name: Print full raw response
+      debug:
+        var: response.json
+
+    - name: Show simplified incident numbers (if any)
+      debug:
+        msg: "{{ item.number }}"
+      loop: "{{ response.json.result | default([]) }}"

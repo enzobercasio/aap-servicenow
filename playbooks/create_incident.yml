@@ -7,17 +7,26 @@
   - servicenow.itsm
 
   tasks:
-    - name: Create an incident ticket
-      servicenow.itsm.incident:
-        instance: "{{ lookup('env', 'SN_INSTANCE') }}"
-        username: "{{ lookup('env', 'SN_USERNAME') }}"
-        password: "{{ lookup('env', 'SN_PASSWORD') }}"
-        state: present
-        description: "Server Unreachable"
-        impact: 2
-        urgency: 2
+    - name: Create an incident using the ServiceNow REST API
+      uri:
+        url: "https://dev313896.service-now.com/api/now/table/incident"
+        method: POST
+        user: "aes.creator"
+        password: "wAAy0$/AsS9n"
+        force_basic_auth: yes
+        headers:
+          Accept: "application/json"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          short_description: "Created via Ansible URI module"
+          description: "This is a workaround for incident module bug"
+          urgency: "2"
+          impact: "2"
+        return_content: yes
+        status_code: 201
       register: result
 
-    - name: Show Incident Info
+    - name: Show result
       debug:
-        var: result.record
+        msg: "{{ result.json.result.number }}"
