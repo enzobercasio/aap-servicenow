@@ -9,12 +9,9 @@
   tasks:
     - name: Send GET request to ServiceNow incident table
       uri:
-        #url: "https://dev313896.service-now.com/api/now/table/incident?sysparm_limit=5&sysparm_display_value=true"
         url: "https://{{ snow_instance }}.service-now.com/api/now/table/incident?sysparm_limit=5&sysparm_display_value=true"
         method: GET
-        #user: "aes.creator"
         user: "{{ snow_username }}"
-        #password: "wAAy0$/AsS9n"
         password: "{{ snow_password }}"
         force_basic_auth: yes
         return_content: yes

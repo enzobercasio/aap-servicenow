@@ -9,10 +9,10 @@
   tasks:
     - name: Create an incident using the ServiceNow REST API
       uri:
-        url: "https://dev313896.service-now.com/api/now/table/incident"
+        url: "https://{{ snow_instance }}.service-now.com/api/now/table/incident"
         method: POST
-        user: "aes.creator"
-        password: "wAAy0$/AsS9n"
+        user: "{{ snow_username }}"
+        password: "{{ snow_password }}"
         force_basic_auth: yes
         headers:
           Accept: "application/json"
@@ -20,9 +20,9 @@
         body_format: json
         body:
           short_description: "Created via Ansible URI module"
-          description: "This is a workaround for incident module bug"
-          urgency: "2"
-          impact: "2"
+          description: "This is a test incident created via Ansible"
+          urgency: "4"
+          impact: "4"
         return_content: yes
         status_code: 201
       register: result
