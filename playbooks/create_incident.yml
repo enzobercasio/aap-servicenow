@@ -1,8 +1,6 @@
 - name: Create an Incident in ServiceNow
   hosts: localhost
   gather_facts: false
-  vars_files:
-    - ../vars/servicenow_vars.yml
   tasks:
     - name: Create an incident ticket
       servicenow.itsm.incident:
