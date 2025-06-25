@@ -1,0 +1,21 @@
+- name: Create a Change Request
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../vars/servicenow_vars.yml
+  tasks:
+    - name: Create change request
+      servicenow.itsm.change_request:
+        instance: "{{ servicenow_instance }}"
+        username: "{{ servicenow_user }}"
+        password: "{{ servicenow_password }}"
+        state: present
+        short_description: "Patch production servers"
+        description: "CR created by Ansible AAP"
+        type: "normal"
+        priority: "3"
+      register: result
+
+    - name: Show Change Request
+      debug:
+        var: result.record

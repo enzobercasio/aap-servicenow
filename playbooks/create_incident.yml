@@ -1,0 +1,21 @@
+- name: Create an Incident in ServiceNow
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../vars/servicenow_vars.yml
+  tasks:
+    - name: Create an incident ticket
+      servicenow.itsm.incident:
+        instance: "{{ servicenow_instance }}"
+        username: "{{ servicenow_user }}"
+        password: "{{ servicenow_password }}"
+        state: present
+        short_description: "Server Unreachable"
+        description: "Incident created by Ansible AAP demo"
+        impact: 2
+        urgency: 2
+      register: result
+
+    - name: Show Incident Info
+      debug:
+        var: result.record

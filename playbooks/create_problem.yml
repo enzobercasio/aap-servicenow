@@ -1,0 +1,19 @@
+- name: Create a Problem Record
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../vars/servicenow_vars.yml
+  tasks:
+    - name: Create problem
+      servicenow.itsm.problem:
+        instance: "{{ servicenow_instance }}"
+        username: "{{ servicenow_user }}"
+        password: "{{ servicenow_password }}"
+        state: present
+        short_description: "Recurring network latency"
+        description: "Problem raised by Ansible"
+      register: result
+
+    - name: Show Problem Info
+      debug:
+        var: result.record
