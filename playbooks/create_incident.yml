@@ -9,9 +9,9 @@
   tasks:
     - name: Create an incident ticket
       servicenow.itsm.incident:
-        instance: "{{ SN_INSTANCE }}"
-        username: "{{ SN_USERNAME }}"
-        password: "{{ SN_PASSWORD }}"
+        instance: "{{ lookup('env', 'SN_INSTANCE') }}"
+        username: "{{ lookup('env', 'SN_USERNAME') }}"
+        password: "{{ lookup('env', 'SN_PASSWORD') }}"
         state: present
         description: "Server Unreachable"
         impact: 2
