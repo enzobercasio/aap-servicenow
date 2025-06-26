@@ -6,10 +6,17 @@
   collections:
   - servicenow.itsm
 
+  #vars:
+  # snow_instance: "dev313896"
+  # snow_username:  "aes.creator"
+  # snow_password: "wAAy0$/AsS9n"
+
+  vars_files:
+    - ../vars/servicenow_vars.yml
   tasks:
     - name: Send GET request to ServiceNow incident table
       uri:
-        url: "https://{{ snow_instance }}.service-now.com/api/now/table/incident?sysparm_limit=5&sysparm_display_value=true"
+        url: "https://{{ snow_instance }}.service-now.com/api/now/table/incident"
         method: GET
         user: "{{ snow_username }}"
         password: "{{ snow_password }}"
@@ -26,11 +33,10 @@
           - "HTTP status: {{ response.status }}"
           - "Sample record: {{ response.json.result[0] | default('No results returned') }}"
 
-    - name: Print full raw response
+    - name: Show simplified incident numbers
       debug:
-        var: response.json
-
-    - name: Show simplified incident numbers (if any)
-      debug:
-        msg: "{{ item.number }}"
+       msg: "{{ item.number }}"
       loop: "{{ response.json.result | default([]) }}"
+      loop_control:
+       label: "{{ item.number }}"
+

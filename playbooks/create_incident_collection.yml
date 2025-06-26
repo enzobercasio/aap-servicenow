@@ -1,0 +1,26 @@
+---
+- name: Create an Incident using ServiceNow ITSM Collection
+  hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - ../vars/servicenow_vars.yml
+
+  tasks:
+    - name: Create incident via servicenow.itsm.incident module
+      servicenow.itsm.incident:
+        instance:
+          host: "https://{{ snow_instance }}.service-now.com"
+          username: "{{ snow_username }}"
+          password: "{{ snow_password }}"
+        
+        state: new
+        short_description: "Incident created using Ansible ITSM collection"
+        description: "This is a demo incident"
+        impact: low
+        urgency: low
+      register: result
+
+    - name: Show the incident number
+      debug:
+        msg: "Incident created: {{ result.record.number }}"

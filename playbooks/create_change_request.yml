@@ -1,21 +1,33 @@
-- name: Create a Change Request
+---
+- name: Create an Incident using ServiceNow ITSM Collection
   hosts: localhost
   gather_facts: false
+
   vars_files:
     - ../vars/servicenow_vars.yml
+
   tasks:
-    - name: Create change request
+    - name: Create incident via servicenow.itsm.change_request module
       servicenow.itsm.change_request:
-        instance: "{{ servicenow_instance }}"
-        username: "{{ servicenow_user }}"
-        password: "{{ servicenow_password }}"
-        state: present
-        short_description: "Patch production servers"
-        description: "CR created by Ansible AAP"
-        type: "normal"
-        priority: "3"
+        instance:
+          host: "https://{{ snow_instance }}.service-now.com"
+          username: "{{ snow_username }}"
+          password: "{{ snow_password }}"
+        
+        type: standard
+        state: new
+        short_description: Install new Cisco
+        description: Please install new Cat. 6500 in Data center 01
+        attachments:
+         - path: path/to/attachment.txt
+        priority: moderate
+        risk: low
+        impact: low
+
+        other:
+          expected_start: 2021-02-12
       register: result
 
-    - name: Show Change Request
+    - name: Show the change request number
       debug:
-        var: result.record
+        msg: "Change Request created: {{ result.record.number }}"

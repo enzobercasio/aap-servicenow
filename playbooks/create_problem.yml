@@ -1,19 +1,34 @@
 - name: Create a Problem Record
   hosts: localhost
   gather_facts: false
-  vars_files:
-    - ../vars/servicenow_vars.yml
+
+  collections:
+  - servicenow.itsm
+
+  vars:
+   snow_instance: "dev313896"
+   snow_username:  "aes.creator"
+   snow_password: "wAAy0$/AsS9n"
+
   tasks:
-    - name: Create problem
-      servicenow.itsm.problem:
-        instance: "{{ servicenow_instance }}"
-        username: "{{ servicenow_user }}"
-        password: "{{ servicenow_password }}"
-        state: present
-        short_description: "Recurring network latency"
-        description: "Problem raised by Ansible"
+    - name: Create a Problem using the ServiceNow REST API
+      uri:
+        url: "https://{{ snow_instance }}.service-now.com/api/now/table/problem"
+        method: POST
+        user: "{{ snow_username }}"
+        password: "{{ snow_password }}"
+        force_basic_auth: yes
+        headers:
+          Accept: "application/json"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          name: "Test problem via Ansible"
+          description: "This is a test problem created via Ansible"
+        return_content: yes
+        status_code: 201
       register: result
 
-    - name: Show Problem Info
+    - name: Show result
       debug:
-        var: result.record
+        msg: "{{ result.json.result.number }}"

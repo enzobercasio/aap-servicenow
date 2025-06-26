@@ -5,7 +5,10 @@
 
   collections:
   - servicenow.itsm
-
+  
+  vars_files:
+    - ../vars/servicenow_vars.yml
+    
   tasks:
     - name: Create an incident using the ServiceNow REST API
       uri:
@@ -19,10 +22,10 @@
           Content-Type: "application/json"
         body_format: json
         body:
-          short_description: "Created via Ansible URI module"
+          short_description: "Incident created using ServiceNow API via Ansible"
           description: "This is a test incident created via Ansible"
-          urgency: "4"
-          impact: "4"
+          urgency: "3"
+          impact: "3"
         return_content: yes
         status_code: 201
       register: result
