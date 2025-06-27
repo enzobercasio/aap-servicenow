@@ -1,0 +1,29 @@
+---
+- name: Create Configuration Item using ServiceNow ITSM Collection
+  hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - ../vars/servicenow_vars.yml
+
+  tasks:
+    - name: Create a configuration item via servicenow.itsm.configuration_item module
+      servicenow.itsm.configuration_item:
+        instance:
+          host: "https://{{ snow_instance }}.service-now.com"
+          username: "{{ snow_username }}"
+          password: "{{ snow_password }}"
+        name: HPE ProLiant BL465C G7
+        short_description: Test CI HPE ProLiant Server G7
+        serial_number: ECE-164-E10834-NO
+        asset_tag: P1000613
+        sys_class_name: cmdb_ci_server
+        environment: production
+        category: Hardware
+        other:
+          model_number: BL465C G7
+      register: server
+
+    - name: Show the configuration item number
+      debug:
+        msg: "Configuration Item created: {{ server.record.name }}, {{ server.record.asset_tag }}"

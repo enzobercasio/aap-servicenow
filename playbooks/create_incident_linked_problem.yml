@@ -1,0 +1,68 @@
+---
+- name: Create a Problem related to a user-specified Incident
+  hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - ../vars/servicenow_vars.yml
+
+  vars_prompt:
+    - name: "incident_number"
+      prompt: "Enter the existing Incident number (e.g., INC0010001)"
+      private: no
+
+  tasks:
+    - name: Fetch incident info
+      servicenow.itsm.incident_info:
+        instance:
+          host: "https://{{ snow_instance }}.service-now.com"
+          username: "{{ snow_username }}"
+          password: "{{ snow_password }}"
+        sysparm_query: "number={{ incident_number }}"
+
+
+      register: incident_info
+
+    - name: Fail if incident is not found
+      fail:
+        msg: "Incident {{ incident_number }} not found!"
+      when: incident_info.records | length == 0
+
+    - name: Store incident sys_id
+      set_fact:
+        incident_sys_id: "{{ (incident_info.records | first).sys_id }}"
+
+    - name: Create related Problem
+      servicenow.itsm.problem:
+        instance:
+          host: "https://{{ snow_instance }}.service-now.com"
+          username: "{{ snow_username }}"
+          password: "{{ snow_password }}"        
+        state: present
+        short_description: "Problem related to {{ incident_number }}"
+        description: >
+          Auto-generated problem linked to {{ incident_number }}
+        impact: 2          # 1-High | 2-Medium | 3-Low
+        urgency: 2         # 1-High | 2-Medium | 3-Low
+      register: problem_result
+
+    - name: Display problem number
+      debug:
+        msg: "Created Problem: {{ problem_result.record.number }}"
+
+    - name: Link Incident to Problem
+      servicenow.itsm.incident:
+        instance:
+          host: "https://{{ snow_instance }}.service-now.com"
+          username: "{{ snow_username }}"
+          password: "{{ snow_password }}"
+        state: present
+        sys_id: "{{ incident_sys_id }}"
+        other:
+          problem_id: "{{ problem_result.record.sys_id }}"
+
+      register: update_result
+
+    - name: Confirm linkage
+      debug:
+        msg: "Linked Incident {{ incident_number }} to Problem {{ problem_result.record.number }}"

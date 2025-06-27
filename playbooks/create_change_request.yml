@@ -1,12 +1,16 @@
 ---
-- name: Create an Incident using ServiceNow ITSM Collection
+- name: Create an Change Request using ServiceNow ITSM Collection
   hosts: localhost
-  gather_facts: false
+  gather_facts: true
 
   vars_files:
     - ../vars/servicenow_vars.yml
 
   tasks:
+    - name: Set expected_start to current time
+      set_fact:
+        expected_start_date: "{{ ansible_date_time.date }}T{{ ansible_date_time.time | regex_replace('\\..*$', '') }}"
+
     - name: Create incident via servicenow.itsm.change_request module
       servicenow.itsm.change_request:
         instance:
@@ -14,18 +18,15 @@
           username: "{{ snow_username }}"
           password: "{{ snow_password }}"
         
-        type: standard
-        state: new
-        short_description: Install new Cisco
-        description: Please install new Cat. 6500 in Data center 01
-        attachments:
-         - path: path/to/attachment.txt
+        short_description: "Install WebServer - test change request"
+        description: "THis is a test change request created in Ansible"
         priority: moderate
         risk: low
         impact: low
 
         other:
-          expected_start: 2021-02-12
+          expected_start: "{{ expected_start_date }}"
+      
       register: result
 
     - name: Show the change request number
